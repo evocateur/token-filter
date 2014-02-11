@@ -1,0 +1,25 @@
+{
+  "name": "token-filter",
+  "version": "0.0.0",
+  "description": "A Transform stream that replaces delimited keys (tokens) with matching values, like the Ant Filter task.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evocateur/token-filter.git"
+  },
+  "keywords": [
+    "transform",
+    "stream",
+    "token",
+    "filter"
+  ],
+  "author": "Daniel Stockman <daniel.stockman@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evocateur/token-filter/issues"
+  },
+  "homepage": "https://github.com/evocateur/token-filter"
+}
