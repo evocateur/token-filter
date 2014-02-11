@@ -103,7 +103,7 @@ TokenFilter.prototype._createTokenRegex = function (tokenDelimiter) {
 
 function readConfig(options, callback) {
     var context = {};
-    var filters = options.filters;
+    var filters = options.filters || [];
     var pending = filters.length;
 
     if (pending === 0) {
