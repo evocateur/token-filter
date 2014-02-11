@@ -114,7 +114,17 @@ describe("TokenFilter", function () {
             });
         });
         describe("when present", function () {
-            it("immediately emits context event");
+            it("immediately sets context property", function () {
+                var context = {
+                    "foo": "bar"
+                };
+                var instance = new TokenFilter({
+                    context: context
+                });
+                instance.should.have.property("context").that.deep.equals(context);
+                // context is not cloned, it is a direct reference
+                instance.context.should.equal(context);
+            });
         });
         describe("after filtering", function () {
             it("should be emitted in context event", function (done) {
