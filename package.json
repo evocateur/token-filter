@@ -31,8 +31,11 @@
     "util-extend": "1.x"
   },
   "devDependencies": {
+    "chai": "~1.9.0",
     "istanbul": "~0.2.4",
     "jshint": "~2.4.3",
-    "mocha": "~1.17.1"
+    "mocha": "~1.17.1",
+    "sinon": "~1.8.1",
+    "sinon-chai": "~2.5.0"
   }
 }
