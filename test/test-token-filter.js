@@ -1,63 +1,152 @@
 /*global describe, it, before, beforeEach, after, afterEach, should, sinon */
 
-var Readable = require("stream").Readable;
+var fs = require("graceful-fs");
+var Transform = require("stream").Transform;
+
 var TokenFilter = require("../");
 
-describe("filtering", function () {
+describe("TokenFilter", function () {
     describe("instantiation", function () {
-        it("works as factory", function () {
+        beforeEach(function () {
+            sinon.stub(TokenFilter, "readConfig");
+        });
+        afterEach(function () {
+            TokenFilter.readConfig.restore();
+        });
+        it("should be a subclass of stream.Transform", function () {
+            (new TokenFilter()).should.be.instanceOf(Transform);
+        });
+        it("should initialize properties", function () {
+            var instance = new TokenFilter();
+            instance.should.have.property("tokenRegex").that.is.an.instanceOf(RegExp);
+            instance.should.have.property("replaceToken").that.is.a("function");
+            instance.should.have.property("_encoding", "utf8");
+            instance.should.have.property("_queue").that.is.an("array");
+        });
+        it("should work as a factory", function () {
             var instance;
             should.not.throw(function () {
                 // jshint newcap:false
                 instance = TokenFilter();
             });
             instance.should.be.instanceOf(TokenFilter);
-            // sinon.stub(TokenFilter, "readConfig");
         });
     });
-    describe("without context", function () {
-        it("reads config from JSON file", function (done) {
-            var instance = new TokenFilter({
-                filters: ["test/fixtures/config.json"]
-            });
-            instance.on("context", function (context) {
-                should.exist(context);
-                context.should.deep.equal({
-                    "foo": "bar"
-                });
+    describe("#readConfig()", function () {
+        beforeEach(function () {
+            sinon.stub(fs, "readFile");
+        });
+        afterEach(function () {
+            fs.readFile.restore();
+        });
+        it("should return callback early when no pending filters", function (done) {
+            TokenFilter.readConfig({}, done);
+        });
+        it("should pass readError to callback", function (done) {
+            var stubReadError = new Error("stubReadError");
+            fs.readFile.withArgs("unreadable").yields(stubReadError);
+            TokenFilter.readConfig({
+                filters: ["unreadable"]
+            }, function (readError) {
+                should.exist(readError);
+                readError.should.have.property("message", "stubReadError");
                 done();
             });
         });
-        it("reads config from properties file", function (done) {
-            var instance = new TokenFilter({
-                filters: ["test/fixtures/config.properties"]
-            });
-            instance.on("context", function (context) {
-                should.exist(context);
-                context.should.deep.equal({
-                    "foo": "bar"
-                });
+        it("should pass parseError to callback", function (done) {
+            fs.readFile.withArgs("bad.json").yields(null, "bad.json");
+            TokenFilter.readConfig({
+                filters: ["bad.json"]
+            }, function (parseError) {
+                should.exist(parseError);
+                parseError.should.be.an.instanceOf(SyntaxError);
                 done();
             });
         });
-        it("reads config from both file types", function (done) {
-            var instance = new TokenFilter({
-                filters: [
-                    "test/fixtures/config.json",
-                    "test/fixtures/config.properties"
-                ]
-            });
-            instance.on("context", function (context) {
+        it("should mix multiple filters into one context", function (done) {
+            fs.readFile.withArgs("good.json").yields(null, '{ "good": true }');
+            fs.readFile.withArgs("good.properties").yields(null, "good = mixed");
+            TokenFilter.readConfig({
+                filters: ["good.json", "good.properties"]
+            }, function (err, context) {
+                should.not.exist(err);
                 should.exist(context);
-                context.should.deep.equal({
-                    "foo": "bar"
-                });
+                context.should.deep.equal({ "good": "mixed" });
                 done();
             });
         });
-        it("replaces tokens in stream");
     });
-    describe("with context", function () {
+    describe("context", function () {
+        beforeEach(function () {
+            sinon.stub(TokenFilter, "readConfig");
+        });
+        afterEach(function () {
+            TokenFilter.readConfig.restore();
+        });
+        describe("when absent", function () {
+            it("should call #readConfig()", function () {
+                var instance = new TokenFilter();
+                TokenFilter.readConfig.should.have.callCount(1);
+            });
+            it("should pass config and bound callback to #readConfig()", function () {
+                var instance = new TokenFilter();
+                TokenFilter.readConfig.should.have.been.calledWith(
+                    sinon.match.object,
+                    sinon.match.func
+                );
+            });
+        });
+        describe("when present", function () {
+            it("immediately emits context event");
+        });
+        describe("after filtering", function () {
+            it("should be emitted in context event", function (done) {
+                TokenFilter.readConfig.yieldsAsync(null, { "foo": "bar" });
+                var instance = new TokenFilter();
+                instance.once("context", function (context) {
+                    should.exist(context);
+                    context.should.deep.equal({
+                        "foo": "bar"
+                    });
+                    done();
+                });
+            });
+            it("should store context in instance property", function (done) {
+                TokenFilter.readConfig.yieldsAsync(null, { "foo": "bar" });
+                var instance = new TokenFilter();
+                instance.once("context", function (context) {
+                    instance.should.have.property("context").that.deep.equals(context);
+                    done();
+                });
+            });
+            it("should set _passThrough state when context missing", function (done) {
+                TokenFilter.readConfig.yieldsAsync();
+                var instance = new TokenFilter();
+                instance.once("context", function (context) {
+                    instance.should.have.property("_passThrough").that.equals(true);
+                    done();
+                });
+            });
+            it("should set _passThrough state when context empty", function (done) {
+                TokenFilter.readConfig.yieldsAsync(null, {});
+                var instance = new TokenFilter();
+                instance.once("context", function (context) {
+                    instance.should.have.property("_passThrough").that.equals(true);
+                    done();
+                });
+            });
+            it("should emit error from readConfig()", function (done) {
+                TokenFilter.readConfig.yieldsAsync("boom");
+                var instance = new TokenFilter();
+                instance.once("error", function (error) {
+                    should.exist(error);
+                    error.should.equal("boom");
+                    done();
+                });
+            });
+        });
+    });
+    describe("piping", function () {
         it("replaces tokens in stream");
     });
 });
