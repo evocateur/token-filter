@@ -20,7 +20,6 @@ describe("TokenFilter", function () {
             var instance = new TokenFilter();
             instance.should.have.property("tokenRegex").that.is.an.instanceOf(RegExp);
             instance.should.have.property("replaceToken").that.is.a("function");
-            instance.should.have.property("_encoding", "utf8");
             instance.should.have.property("_queue").that.is.an("array");
         });
         it("should work as a factory", function () {
