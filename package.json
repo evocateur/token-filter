@@ -21,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/evocateur/token-filter/issues"
   },
-  "homepage": "https://github.com/evocateur/token-filter"
+  "homepage": "https://github.com/evocateur/token-filter",
+  "dependencies": {
+    "graceful-fs": "2.x",
+    "properties": "1.2.x",
+    "util-extend": "1.x"
+  }
 }
