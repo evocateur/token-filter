@@ -40,7 +40,7 @@ function TokenFilter(options) {
     if (options.context) {
         this._contextFiltered(null, options.context);
     } else {
-        readConfig(options, this._contextFiltered.bind(this));
+        TokenFilter.readConfig(options, this._contextFiltered.bind(this));
     }
 }
 
