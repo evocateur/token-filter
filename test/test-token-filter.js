@@ -63,6 +63,23 @@ describe("TokenFilter", function () {
                 done();
             });
         });
+        it("should warn about invalid file extension", function (done) {
+            sinon.stub(console, "warn");
+            fs.readFile.withArgs("invalid.cfg").yields(null, "invalid = extension");
+            fs.readFile.withArgs("good.json").yields(null, '{ "good": true }');
+            TokenFilter.readConfig({
+                filters: ["invalid.cfg", "good.json"]
+            }, function (err, context) {
+                should.exist(context);
+                context.should.deep.equal({ "good": true });
+                console.warn.should.have.been.calledWith(
+                    "Skipping invalid file extension: %s",
+                    "invalid.cfg"
+                );
+                console.warn.restore();
+                done();
+            });
+        });
         it("should mix multiple filters into one context", function (done) {
             fs.readFile.withArgs("good.json").yields(null, '{ "good": true }');
             fs.readFile.withArgs("good.properties").yields(null, "good = mixed");
