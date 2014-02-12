@@ -8,4 +8,17 @@ A Transform stream that replaces delimited keys (tokens) with matching values, l
 
 ```js
 var TokenFilter = require('token-filter');
+var fs = require('fs');
+
+// input.txt => "Hello, @name@!"
+var input  = fs.createReadStream('input.txt');
+var output = fs.createWriteStream('output.txt');
+var filter = new TokenFilter({
+    context: {
+        name: "World"
+    }
+});
+
+input.pipe(filter).pipe(output);
+// output.txt => "Hello, World!"
 ```
