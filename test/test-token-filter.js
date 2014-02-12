@@ -172,7 +172,11 @@ describe("TokenFilter", function () {
             });
         });
     });
-    describe("piping", function () {
-        it("replaces tokens in stream");
+    describe("processing", function () {
+        it("does not modify stream when no tokens configured");
+        it("does not modify stream when no tokens present");
+        it("does not modify stream when no tokens matched");
+        it("replaces matching tokens in stream");
+        it("replaces matching tokens in stream across chunks");
     });
 });
