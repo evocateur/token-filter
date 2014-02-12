@@ -4,7 +4,7 @@
   "description": "A Transform stream that replaces delimited keys (tokens) with matching values, like the Ant Filter task.",
   "main": "index.js",
   "scripts": {
-    "pretest": "jshint index.js test",
+    "pretest": "jshint index.js lib test",
     "test": "istanbul cover --print both ./node_modules/mocha/bin/_mocha",
     "posttest": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100"
   },
