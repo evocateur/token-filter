@@ -173,10 +173,67 @@ describe("TokenFilter", function () {
         });
     });
     describe("processing", function () {
-        it("does not modify stream when no tokens configured");
-        it("does not modify stream when no tokens present");
-        it("does not modify stream when no tokens matched");
-        it("replaces matching tokens in stream");
+        it("does not modify stream when no tokens configured", function (done) {
+            var instance = new TokenFilter({
+                "context": {}
+            });
+            instance.on("readable", function () {
+                instance.read().should.equal("Hello, @city@!");
+                instance.end(done);
+            });
+            instance.write("Hello, @city@!");
+        });
+        it("does not modify stream when no tokens present", function (done) {
+            var instance = new TokenFilter({
+                "context": {
+                    "city": "Toledo"
+                }
+            });
+            instance.on("readable", function () {
+                instance.read().should.equal("Hello, Detroit!");
+                instance.end(done);
+            });
+            instance.write("Hello, Detroit!");
+        });
+        it("does not modify stream when no tokens matched", function (done) {
+            var instance = new TokenFilter({
+                "context": {
+                    "city": "Poughkeepsie"
+                }
+            });
+            instance.on("readable", function () {
+                instance.read().should.equal("Hello, @starship@!");
+                instance.end(done);
+            });
+            instance.write("Hello, @starship@!");
+        });
+        it("replaces matching tokens in stream", function (done) {
+            var instance = new TokenFilter({
+                "context": {
+                    "city": "Des Moines"
+                }
+            });
+            instance.on("readable", function () {
+                instance.read().should.equal("Hello, Des Moines!");
+                instance.end(done);
+            });
+            instance.write("Hello, @city@!");
+        });
+        it("replaces matching tokens in stream after queuing", function (done) {
+            sinon.stub(TokenFilter, "readConfig").yieldsAsync(null, {
+                "city": "Medicine Hat"
+            });
+            var instance = new TokenFilter();
+            instance.once("readable", function () {
+                instance.read().should.equal("Hello, Medicine Hat!");
+                TokenFilter.readConfig.restore();
+                instance.end(done);
+            });
+            instance.write("Hello, @city@!");
+            instance.on("context", function () {
+                instance.write("I said hello, @city@!");
+            });
+        });
         it("replaces matching tokens in stream across chunks");
     });
 });
