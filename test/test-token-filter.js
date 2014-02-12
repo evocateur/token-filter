@@ -178,8 +178,11 @@ describe("TokenFilter", function () {
                 "context": {}
             });
             instance.on("readable", function () {
-                instance.read().should.equal("Hello, @city@!");
-                instance.end(done);
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.should.equal("Hello, @city@!");
+                    instance.end(done);
+                }
             });
             instance.write("Hello, @city@!");
         });
@@ -190,8 +193,11 @@ describe("TokenFilter", function () {
                 }
             });
             instance.on("readable", function () {
-                instance.read().should.equal("Hello, Detroit!");
-                instance.end(done);
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.should.equal("Hello, Detroit!");
+                    instance.end(done);
+                }
             });
             instance.write("Hello, Detroit!");
         });
@@ -202,8 +208,11 @@ describe("TokenFilter", function () {
                 }
             });
             instance.on("readable", function () {
-                instance.read().should.equal("Hello, @starship@!");
-                instance.end(done);
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.should.equal("Hello, @starship@!");
+                    instance.end(done);
+                }
             });
             instance.write("Hello, @starship@!");
         });
@@ -214,8 +223,11 @@ describe("TokenFilter", function () {
                 }
             });
             instance.on("readable", function () {
-                instance.read().should.equal("Hello, Des Moines!");
-                instance.end(done);
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.should.equal("Hello, Des Moines!");
+                    instance.end(done);
+                }
             });
             instance.write("Hello, @city@!");
         });
@@ -225,8 +237,11 @@ describe("TokenFilter", function () {
             });
             var instance = new TokenFilter();
             instance.once("readable", function () {
-                instance.read().should.equal("Hello, Medicine Hat!");
-                TokenFilter.readConfig.restore();
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.should.equal("Hello, Medicine Hat!");
+                    TokenFilter.readConfig.restore();
+                }
                 instance.end(done);
             });
             instance.write("Hello, @city@!");
