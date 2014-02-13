@@ -91,6 +91,19 @@ describe("TokenFilter", function () {
             });
             instance.write("Hello, @city@!");
         });
+        it("replaces custom tokens in stream", function (done) {
+            var instance = new TokenFilter({ "city": "Medicine Hat" }, {
+                tokenDelimiter: "__"
+            });
+            instance.on("readable", function () {
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.toString().should.equal("Hello, Medicine Hat!");
+                    instance.end(done);
+                }
+            });
+            instance.write("Hello, __city__!");
+        });
         it("replaces matching tokens in stream across chunks");
     });
 });
