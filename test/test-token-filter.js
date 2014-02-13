@@ -1,7 +1,7 @@
 /*global describe, it, before, beforeEach, after, afterEach, should, sinon */
 
 var Transform = require("stream").Transform;
-var TokenFilter = require("../");
+var TokenFilter = require("../token-filter");
 
 describe("TokenFilter", function () {
     describe("instantiation", function () {

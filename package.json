@@ -2,14 +2,13 @@
   "name": "token-filter",
   "version": "0.2.2",
   "description": "A Transform stream that replaces delimited keys (tokens) with matching values, like the Ant Filter task.",
-  "main": "index.js",
+  "main": "token-filter.js",
   "files": [
-    "index.js",
-    "lib",
+    "token-filter.js",
     "LICENSE.md"
   ],
   "scripts": {
-    "pretest": "jshint index.js lib test",
+    "pretest": "jshint token-filter.js test",
     "test": "istanbul cover --print both ./node_modules/mocha/bin/_mocha",
     "posttest": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100"
   },
@@ -30,8 +29,6 @@
     "url": "https://github.com/evocateur/token-filter/issues"
   },
   "homepage": "https://github.com/evocateur/token-filter",
-  "dependencies": {
-  },
   "devDependencies": {
     "chai": "~1.9.0",
     "istanbul": "~0.2.4",
