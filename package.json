@@ -1,6 +1,6 @@
 {
   "name": "token-filter",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A Transform stream that replaces delimited keys (tokens) with matching values, like the Ant Filter task.",
   "main": "token-filter.js",
   "files": [
