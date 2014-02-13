@@ -13,7 +13,7 @@ describe("TokenFilter", function () {
             instance.should.have.property("tokenRegex").that.is.an.instanceOf(RegExp);
             instance.should.have.property("replaceToken").that.is.a("function");
         });
-        it("should work as a factory", function () {
+        it("should work when called as a factory", function () {
             var instance;
             should.not.throw(function () {
                 // jshint newcap:false
@@ -46,7 +46,7 @@ describe("TokenFilter", function () {
             });
         });
     });
-    describe("processing", function () {
+    describe("streaming", function () {
         function streamReader(instance) {
             instance.on("readable", reader);
             function reader() {
@@ -59,7 +59,7 @@ describe("TokenFilter", function () {
             reader.result = "";
             return reader;
         }
-        it("does not modify stream when no tokens configured", function (done) {
+        it("should not transform when no tokens configured", function (done) {
             var instance = new TokenFilter({});
             var reader = streamReader(instance);
             instance.end("Hello, @city@!", function () {
@@ -67,7 +67,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("does not modify stream when no tokens present", function (done) {
+        it("should not transform when no tokens present", function (done) {
             var instance = new TokenFilter({ "city": "Toledo" });
             var reader = streamReader(instance);
             instance.end("Hello, Detroit!", function () {
@@ -75,7 +75,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("does not modify stream when no tokens matched", function (done) {
+        it("should not transform when no tokens matched", function (done) {
             var instance = new TokenFilter({ "city": "Poughkeepsie" });
             var reader = streamReader(instance);
             instance.end("Hello, @starship@!", function () {
@@ -83,7 +83,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("replaces matching tokens in stream", function (done) {
+        it("should transform matching tokens", function (done) {
             var instance = new TokenFilter({ "city": "Des Moines" });
             var reader = streamReader(instance);
             instance.end("Hello, @city@!", function () {
@@ -91,7 +91,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("replaces custom tokens in stream", function (done) {
+        it("should transform matching custom tokens", function (done) {
             var instance = new TokenFilter({ "city": "Medicine Hat" }, {
                 tokenDelimiter: "__"
             });
@@ -101,7 +101,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("replaces tokens when encoding set", function (done) {
+        it("should transform matching tokens when encoding set", function (done) {
             var instance = new TokenFilter({ "city": "Omaha" }, {
                 encoding: "utf8"
             });
@@ -111,7 +111,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("replaces matching tokens in stream across chunks", function (done) {
+        it("should transform matching tokens across chunks", function (done) {
             var instance = new TokenFilter({ "city": "Topeka" }, {
                 encoding: "utf8"
             });
@@ -122,7 +122,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("should allow non-matching token across chunks", function (done) {
+        it("should allow unpaired tokens across chunks", function (done) {
             var instance = new TokenFilter({ "city": "Minneapolis" });
             var reader = streamReader(instance);
             instance.write("Hello, @ci");
@@ -133,7 +133,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it("should allow non-matching custom token across chunks", function (done) {
+        it("should allow unpaired custom tokens across chunks", function (done) {
             var instance = new TokenFilter({ "city": "St. Paul" }, {
                 tokenDelimiter: "__"
             });
