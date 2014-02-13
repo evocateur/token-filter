@@ -111,6 +111,23 @@ describe("TokenFilter", function () {
             });
             instance.end("Hello, @city@!", done);
         });
-        it("replaces matching tokens in stream across chunks");
+        it.skip("replaces matching tokens in stream across chunks", function (done) {
+            var instance = new TokenFilter({ "city": "Topeka" }, {
+                encoding: "utf8"
+            });
+            var result = "";
+            instance.on("readable", function () {
+                var chunk = instance.read();
+                while (chunk !== null) {
+                    result += chunk.toString();
+                    chunk = instance.read();
+                }
+            });
+            instance.write("Hello, @ci");
+            instance.end("ty@!", function () {
+                result.should.equal("Hello, Topeka!");
+                done();
+            });
+        });
     });
 });
