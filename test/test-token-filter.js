@@ -99,6 +99,18 @@ describe("TokenFilter", function () {
             });
             instance.end("Hello, __city__!", done);
         });
+        it("replaces tokens when encoding set", function (done) {
+            var instance = new TokenFilter({ "city": "Omaha" }, {
+                encoding: "utf8"
+            });
+            instance.on("readable", function () {
+                var chunk = instance.read();
+                if (chunk) {
+                    chunk.toString().should.equal("Hello, Omaha!");
+                }
+            });
+            instance.end("Hello, @city@!", done);
+        });
         it("replaces matching tokens in stream across chunks");
     });
 });
