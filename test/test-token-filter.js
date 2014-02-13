@@ -111,7 +111,7 @@ describe("TokenFilter", function () {
                 done();
             });
         });
-        it.skip("replaces matching tokens in stream across chunks", function (done) {
+        it("replaces matching tokens in stream across chunks", function (done) {
             var instance = new TokenFilter({ "city": "Topeka" }, {
                 encoding: "utf8"
             });
@@ -119,6 +119,30 @@ describe("TokenFilter", function () {
             instance.write("Hello, @ci");
             instance.end("ty@!", function () {
                 reader.result.should.equal("Hello, Topeka!");
+                done();
+            });
+        });
+        it("should allow non-matching token across chunks", function (done) {
+            var instance = new TokenFilter({ "city": "Minneapolis" });
+            var reader = streamReader(instance);
+            instance.write("Hello, @ci");
+            instance.write("ty@! ");
+            instance.write("Lunch @ 12pm, ");
+            instance.end("dinner @ 6pm.", function () {
+                reader.result.should.equal("Hello, Minneapolis! Lunch @ 12pm, dinner @ 6pm.");
+                done();
+            });
+        });
+        it("should allow non-matching custom token across chunks", function (done) {
+            var instance = new TokenFilter({ "city": "St. Paul" }, {
+                tokenDelimiter: "__"
+            });
+            var reader = streamReader(instance);
+            instance.write("Hello, __ci");
+            instance.write("ty__! ");
+            instance.write("You're _co");
+            instance.end("ld_.", function () {
+                reader.result.should.equal("Hello, St. Paul! You're _cold_.");
                 done();
             });
         });
