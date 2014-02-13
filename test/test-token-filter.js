@@ -53,10 +53,9 @@ describe("TokenFilter", function () {
                 var chunk = instance.read();
                 if (chunk) {
                     chunk.toString().should.equal("Hello, @city@!");
-                    instance.end(done);
                 }
             });
-            instance.write("Hello, @city@!");
+            instance.end("Hello, @city@!", done);
         });
         it("does not modify stream when no tokens present", function (done) {
             var instance = new TokenFilter({ "city": "Toledo" });
@@ -64,10 +63,9 @@ describe("TokenFilter", function () {
                 var chunk = instance.read();
                 if (chunk) {
                     chunk.toString().should.equal("Hello, Detroit!");
-                    instance.end(done);
                 }
             });
-            instance.write("Hello, Detroit!");
+            instance.end("Hello, Detroit!", done);
         });
         it("does not modify stream when no tokens matched", function (done) {
             var instance = new TokenFilter({ "city": "Poughkeepsie" });
@@ -75,10 +73,9 @@ describe("TokenFilter", function () {
                 var chunk = instance.read();
                 if (chunk) {
                     chunk.toString().should.equal("Hello, @starship@!");
-                    instance.end(done);
                 }
             });
-            instance.write("Hello, @starship@!");
+            instance.end("Hello, @starship@!", done);
         });
         it("replaces matching tokens in stream", function (done) {
             var instance = new TokenFilter({ "city": "Des Moines" });
@@ -86,10 +83,9 @@ describe("TokenFilter", function () {
                 var chunk = instance.read();
                 if (chunk) {
                     chunk.toString().should.equal("Hello, Des Moines!");
-                    instance.end(done);
                 }
             });
-            instance.write("Hello, @city@!");
+            instance.end("Hello, @city@!", done);
         });
         it("replaces custom tokens in stream", function (done) {
             var instance = new TokenFilter({ "city": "Medicine Hat" }, {
@@ -99,10 +95,9 @@ describe("TokenFilter", function () {
                 var chunk = instance.read();
                 if (chunk) {
                     chunk.toString().should.equal("Hello, Medicine Hat!");
-                    instance.end(done);
                 }
             });
-            instance.write("Hello, __city__!");
+            instance.end("Hello, __city__!", done);
         });
         it("replaces matching tokens in stream across chunks");
     });
