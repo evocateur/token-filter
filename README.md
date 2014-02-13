@@ -8,13 +8,22 @@ A Transform stream that replaces delimited keys (tokens) with matching values, l
 
 ```js
 var fs = require('fs');
-var TokenFilter = require('token-filter');
+var tokenFilter = require('token-filter');
 
 // input.txt => "Hello, @name@!"
-var input  = fs.createReadStream('input.txt');
-var output = fs.createWriteStream('output.txt');
-var filter = new TokenFilter({ name: "World" });
-
-input.pipe(filter).pipe(output);
+fs.createReadStream('input.txt')
+    .pipe(tokenFilter({ name: "World" }))
+    .pipe(fs.createWriteStream('output.txt'));
 // output.txt => "Hello, World!"
 ```
+
+## API
+
+### `tokenFilter(context, [options])`
+
+* `context` {Object} Values to interpolate into matched keys.
+* `options` {Object} (optional)
+  * `tokenDelimiter` {String} The string that begins and ends a token (default "@").
+  * `highWaterMark` {Number} The stream's highWaterMark, defaulting to fs.ReadStream's default (64KB).
+
+Additional stream options are detailed in the [core manual](http://nodejs.org/api/stream.html).
