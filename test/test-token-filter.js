@@ -47,85 +47,78 @@ describe("TokenFilter", function () {
         });
     });
     describe("processing", function () {
+        function streamReader(instance) {
+            instance.on("readable", reader);
+            function reader() {
+                var chunk = this.read();
+                while (chunk !== null) {
+                    reader.result += chunk.toString();
+                    chunk = this.read();
+                }
+            }
+            reader.result = "";
+            return reader;
+        }
         it("does not modify stream when no tokens configured", function (done) {
             var instance = new TokenFilter({});
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, @city@!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, @city@!", function () {
+                reader.result.should.equal("Hello, @city@!");
+                done();
             });
-            instance.end("Hello, @city@!", done);
         });
         it("does not modify stream when no tokens present", function (done) {
             var instance = new TokenFilter({ "city": "Toledo" });
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, Detroit!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, Detroit!", function () {
+                reader.result.should.equal("Hello, Detroit!");
+                done();
             });
-            instance.end("Hello, Detroit!", done);
         });
         it("does not modify stream when no tokens matched", function (done) {
             var instance = new TokenFilter({ "city": "Poughkeepsie" });
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, @starship@!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, @starship@!", function () {
+                reader.result.should.equal("Hello, @starship@!");
+                done();
             });
-            instance.end("Hello, @starship@!", done);
         });
         it("replaces matching tokens in stream", function (done) {
             var instance = new TokenFilter({ "city": "Des Moines" });
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, Des Moines!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, @city@!", function () {
+                reader.result.should.equal("Hello, Des Moines!");
+                done();
             });
-            instance.end("Hello, @city@!", done);
         });
         it("replaces custom tokens in stream", function (done) {
             var instance = new TokenFilter({ "city": "Medicine Hat" }, {
                 tokenDelimiter: "__"
             });
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, Medicine Hat!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, __city__!", function () {
+                reader.result.should.equal("Hello, Medicine Hat!");
+                done();
             });
-            instance.end("Hello, __city__!", done);
         });
         it("replaces tokens when encoding set", function (done) {
             var instance = new TokenFilter({ "city": "Omaha" }, {
                 encoding: "utf8"
             });
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                if (chunk) {
-                    chunk.toString().should.equal("Hello, Omaha!");
-                }
+            var reader = streamReader(instance);
+            instance.end("Hello, @city@!", function () {
+                reader.result.should.equal("Hello, Omaha!");
+                done();
             });
-            instance.end("Hello, @city@!", done);
         });
         it.skip("replaces matching tokens in stream across chunks", function (done) {
             var instance = new TokenFilter({ "city": "Topeka" }, {
                 encoding: "utf8"
             });
-            var result = "";
-            instance.on("readable", function () {
-                var chunk = instance.read();
-                while (chunk !== null) {
-                    result += chunk.toString();
-                    chunk = instance.read();
-                }
-            });
+            var reader = streamReader(instance);
             instance.write("Hello, @ci");
             instance.end("ty@!", function () {
-                result.should.equal("Hello, Topeka!");
+                reader.result.should.equal("Hello, Topeka!");
                 done();
             });
         });
