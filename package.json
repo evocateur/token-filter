@@ -3,6 +3,11 @@
   "version": "0.2.1",
   "description": "A Transform stream that replaces delimited keys (tokens) with matching values, like the Ant Filter task.",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "LICENSE.md"
+  ],
   "scripts": {
     "pretest": "jshint index.js lib test",
     "test": "istanbul cover --print both ./node_modules/mocha/bin/_mocha",
